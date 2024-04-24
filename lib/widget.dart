@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget HeightSpace(
+Widget heightSpace(
   double h,
 ) {
   return SizedBox(
@@ -9,7 +9,7 @@ Widget HeightSpace(
 }
 
 ///Horizontal Space
-Widget WidthSpace(
+Widget widthSpace(
   double w,
 ) {
   return SizedBox(

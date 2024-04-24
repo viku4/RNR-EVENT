@@ -1,8 +1,6 @@
 import 'dart:math';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:abybaby_it/widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:abybaby_it/typing_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -15,7 +13,11 @@ class ProjectDetailsPage extends StatefulWidget {
   State<ProjectDetailsPage> createState() => _ProjectDetailsPageState();
 }
 
-class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
+class _ProjectDetailsPageState extends State<ProjectDetailsPage>
+    with SingleTickerProviderStateMixin {
+  // late Animation<double> _animation;
+  // late AnimationController _animationController;
+
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
   List photo = [];
@@ -26,7 +28,18 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   @override
   void initState() {
     super.initState();
-
+    // _animationController = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(seconds: 5),
+    // );
+    // _animation = Tween<double>(
+    //   begin: 0,
+    //   end: 1,
+    // ).animate(CurvedAnimation(
+    //   parent: _animationController,
+    //   curve: Curves.easeInOut,
+    // ));
+    // _animationController.forward();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
         loading = true;
@@ -616,6 +629,12 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   }
 
   @override
+  void dispose() {
+    // _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -650,7 +669,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           color: Colors.white.withOpacity(1),
                         ),
                       ),
-                      WidthSpace(20),
+                      widthSpace(20),
                       Container(
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.white, width: 5)),
@@ -688,14 +707,19 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            workMonth.length,
-                            (index) => makeItem(
-                              month: workMonth[index]["month"],
-                              year: workMonth[index]["year"],
-                              data: workMonth[index]["data"],
-                            ),
-                          ),
+                          children: [
+                            for (int index = 0;
+                                index < workMonth.length;
+                                index++)
+                              DelayedAnimation(
+                                delay: Duration(milliseconds: 500 * index),
+                                child: makeItem(
+                                  month: workMonth[index]["month"],
+                                  year: workMonth[index]["year"],
+                                  data: workMonth[index]["data"],
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
@@ -753,13 +777,16 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                                         CrossAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SizedBox(
-                                        height: 200,
-                                        width: 200,
-                                        child: Image.asset(
-                                          // alignment: Alignment.topCenter,
-                                          work[index]["image"],
-                                          fit: BoxFit.cover,
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: SizedBox(
+                                          height: 200,
+                                          width: 200,
+                                          child: Image.asset(
+                                            // alignment: Alignment.topCenter,
+                                            work[index]["image"],
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(
@@ -816,26 +843,25 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                           Align(
                             alignment: Alignment.bottomCenter,
                             child: Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: AnimatedSmoothIndicator(
-                                  onDotClicked: (index) {
-                                    _controller.jumpToPage(index);
-                                  },
-                                  activeIndex: _currentIndex,
-                                  count: work.length,
-                                  effect: WormEffect(
-                                    dotHeight: 15,
-                                    dotWidth: 15,
-                                    radius: 20,
-                                    dotColor:
-                                        Colors.pinkAccent.withOpacity(0.5),
-                                    activeDotColor:
-                                        Colors.black.withOpacity(0.8),
-                                  ),
-                                )),
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: AnimatedSmoothIndicator(
+                                onDotClicked: (index) {
+                                  _controller.jumpToPage(index);
+                                },
+                                activeIndex: _currentIndex,
+                                count: work.length,
+                                effect: WormEffect(
+                                  dotHeight: 15,
+                                  dotWidth: 15,
+                                  radius: 20,
+                                  dotColor: Colors.pinkAccent.withOpacity(0.5),
+                                  activeDotColor: Colors.black.withOpacity(0.8),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(
@@ -874,30 +900,31 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       Align(
                         alignment: Alignment.center,
                         child: Container(
-                            width: fullWidth(context) / 2,
-                            height: 400,
-                            color: Colors.amber.shade50,
-                            alignment: Alignment.center,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: photo.length,
-                              // controller: scrollController,
-                              itemBuilder: (BuildContext context, int index) {
-                                log(photo.length);
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    height: 200,
-                                    child: Image.asset(
-                                      // alignment: Alignment.topCenter,
-                                      photo[index],
-                                      fit: BoxFit.cover,
-                                    ),
+                          width: fullWidth(context) / 2,
+                          height: 400,
+                          color: Colors.amber.shade50,
+                          alignment: Alignment.center,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: photo.length,
+                            // controller: scrollController,
+                            itemBuilder: (BuildContext context, int index) {
+                              log(photo.length);
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  height: 200,
+                                  child: Image.asset(
+                                    // alignment: Alignment.topCenter,
+                                    photo[index],
+                                    fit: BoxFit.cover,
                                   ),
-                                );
-                              },
-                            )),
-                      )
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ],
                   )
                 ],
@@ -927,15 +954,15 @@ Widget makeItem({month, year, required List data}) {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  year.toString(),
+                buildTypeText(
+                  txt: year.toString(),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  month.toString(),
+                buildTypeText(
+                  txt: month.toString(),
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -969,34 +996,39 @@ Widget makeItem({month, year, required List data}) {
                 ),
               ),
               Container(
-                  height: 150,
-                  width: 1100,
-                  alignment: Alignment.center,
-                  child: GridView.count(
-                      padding: const EdgeInsets.all(10),
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 4.0,
-                      mainAxisSpacing: 8.0,
-                      childAspectRatio: 10,
-                      children: List.generate(data.length, (index) {
-                        return ListTile(
-                          title: Text(data[index]),
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.pinkAccent,
-                              border: Border.all(
-                                color: Colors.white,
-                              ),
-                            ),
-                            width: 20,
-                            height: 20,
-                            child: const Center(
-                              child: Icon(Icons.done,
-                                  size: 12, color: Colors.white),
+                height: 150,
+                width: 1100,
+                alignment: Alignment.center,
+                child: GridView.count(
+                  padding: const EdgeInsets.all(10),
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 10,
+                  children: List.generate(
+                    data.length,
+                    (index) {
+                      return ListTile(
+                        title: buildTypeText(txt: data[index]),
+                        leading: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.pinkAccent,
+                            border: Border.all(
+                              color: Colors.white,
                             ),
                           ),
-                        );
-                      }))),
+                          width: 20,
+                          height: 20,
+                          child: const Center(
+                            child:
+                                Icon(Icons.done, size: 12, color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -1107,3 +1139,54 @@ Widget makeItem({month, year, required List data}) {
 //   );
 
 // }
+class DelayedAnimation extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const DelayedAnimation({required this.child, required this.delay});
+
+  @override
+  _DelayedAnimationState createState() => _DelayedAnimationState();
+}
+
+class _DelayedAnimationState extends State<DelayedAnimation>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+
+    Future.delayed(widget.delay, () {
+      if (mounted) {
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SlideTransition(
+      position: _animation,
+      child: widget.child,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}

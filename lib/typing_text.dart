@@ -6,7 +6,9 @@ buildTypeText({
   required String txt,
 }) {
   return TypeText(
+    
     style: style ?? const TextStyle(color: Colors.black, fontSize: 14),
+    overflow: TextOverflow.ellipsis,
     textAlign: TextAlign.start,
     txt,
     duration: const Duration(seconds: 1),
